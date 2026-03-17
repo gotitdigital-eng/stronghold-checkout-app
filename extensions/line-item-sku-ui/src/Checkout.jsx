@@ -1,58 +1,22 @@
-import '@shopify/ui-extensions/preact';
-import {render} from "preact";
+import '@shopify/ui-extensions/preact'
+import { render } from 'preact'
 
-// 1. Export the extension
 export default async () => {
-  render(<Extension />, document.body)
-};
+  render(<LineItemSku />, document.body)
+}
 
-function Extension() {
-  // 2. Check instructions for feature availability
-  if (!shopify.instructions.value.metafields.canSetCartMetafields) {
-    return (
-      <s-banner heading="line-item-sku-ui" tone="warning">
-        {shopify.i18n.translate("metafieldChangesAreNotSupported")}
-      </s-banner>
-    );
-  }
+function LineItemSku() {
+  const line = shopify.target.value
+  const sku = getCombinedSku(line)
 
-  const freeGiftRequested = shopify.appMetafields.value.find(
-    (appMetafield) =>
-      appMetafield.target.type === "cart" &&
-      appMetafield.metafield.namespace === "$app" &&
-      appMetafield.metafield.key === "requestedFreeGift",
-  );
+  return sku ? <s-text type='strong' color='subdued'>SKU: {sku}</s-text> : null
+}
 
-  // 3. Render a UI
-  return (
-    <s-banner heading="line-item-sku-ui">
-      <s-stack gap="base">
-        <s-text>
-          {shopify.i18n.translate("welcome", {
-            target: <s-text type="emphasis">{shopify.extension.target}</s-text>,
-          })}
-        </s-text>
-        <s-checkbox
-          checked={freeGiftRequested?.metafield?.value === "true"}
-          onChange={onCheckboxChange}
-          label={shopify.i18n.translate("iWouldLikeAFreeGiftWithMyOrder")}
-        />
-      </s-stack>
-    </s-banner>
-  );
+function getCombinedSku(line) {
+  if (!line) return ''
 
-  async function onCheckboxChange(event) {
-    const isChecked = event.target.checked;
-    // 4. Call the API to modify checkout
-    const result = await shopify.applyMetafieldChange({
-      type: "updateCartMetafield",
-      metafield: {
-        namespace: "$app",
-        key: "requestedFreeGift",
-        value: isChecked ? "true" : "false",
-        type: "boolean",
-      },
-    });
-    console.log("applyMetafieldChange result", result);
-  }
+  const skuAttrKeys = ['SKU', 'Full SKU']
+  const fromAttr = line.attributes?.find((a) => skuAttrKeys.includes(a.key))?.value
+
+  return fromAttr ?? line.merchandise?.sku ?? ''
 }

@@ -15,9 +15,14 @@ uid = "3bbf9ea7-5a0e-2073-ce0b-ae21fc8653867ac81750"
 # and the file that contains your extension’s source code. Learn more:
 # https://shopify.dev/docs/api/checkout-ui-extensions/latest/extension-targets-overview
 
+# SKU renders after all line item info (including properties). See extension-targets-overview.
 [[extensions.targeting]]
 module = "./src/Checkout.jsx"
-target = "purchase.checkout.block.render"
+target = "purchase.checkout.cart-line-item.render-after"
+
+[[extensions.targeting]]
+module = "./src/Checkout.jsx"
+target = "purchase.thank-you.cart-line-item.render-after"
 
 [extensions.capabilities]
 # Gives your extension access to directly query Shopify’s storefront API.
@@ -28,14 +33,6 @@ api_access = true
 # JavaScript `fetch()` API. Learn more:
 # https://shopify.dev/docs/api/checkout-ui-extensions/latest/configuration#network-access
 # network_access = true
-
-# Loads metafields on checkout resources, including the cart,
-# products, customers, and more. Learn more:
-# https://shopify.dev/docs/api/checkout-ui-extensions/latest/configuration#metafields
-
-[[extensions.metafields]]
-namespace = "$app"
-key = "requestedFreeGift"
 
 # Defines settings that will be collected from merchants installing
 # your extension. Learn more:
